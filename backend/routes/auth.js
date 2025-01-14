@@ -31,7 +31,9 @@ router.post(
       // Check if a user with the given email already exists
       let user = await User.findOne({ email: req.body.email });
       if (user) {
-        return res.status(400).json({ error: "User with this email already exists" });
+        return res
+          .status(400)
+          .json({ error: "User with this email already exists" });
       }
 
       // Hash the password using bcrypt
@@ -56,6 +58,59 @@ router.post(
 
       // Send the token back to the client
       res.json({ authtoken });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);
+
+
+
+// Authenticate a user using: POST "/api/auth/login". No login required
+
+router.post(
+  "/login",
+  [
+    // Validation rules
+    
+    body("email", "Please enter a valid email").isEmail(),
+    body("password", "Password cannot be blank").exists()
+  ],
+  async (req, res) => {
+    // If there are errors, return bad request and the errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const{email,password}=req.body;
+
+    try {
+      let user=await User.findOne({email:email});  //user contains a json of that user
+      if(!user){
+        return res.status(400).json({error:"Please try to login with correct credentials"});
+      }
+      const passwordcompare= await bcrypt.compare(password,user.password);//It returns true or false
+      if(!passwordcompare){
+
+        return res.status(400).json({error:"Please try to login with correct credentials"});
+
+      }
+      // Create a JWT token for the user
+      const data = {
+        user: {
+          id: user.id, // Store the user ID in the token
+        },
+      };
+
+      const authtoken = jwt.sign(data, JWT_SECRET);
+
+      // Send the token back to the client
+      res.json({ authtoken });
+
+
+
     } catch (error) {
       console.error(error.message);
       res.status(500).send("Internal Server Error");
