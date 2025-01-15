@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = "Adarshisagoodboy";
 
-// Create a user using: POST "/api/auth/createuser". No login required
+// Route 1:Create a user using: POST "/api/auth/createuser". No login required
 router.post(
   "/createuser",
   [
@@ -67,7 +67,7 @@ router.post(
 
 
 
-// Authenticate a user using: POST "/api/auth/login". No login required
+//Route 2: Authenticate a user using: POST "/api/auth/login". No login required
 
 router.post(
   "/login",
@@ -118,4 +118,16 @@ router.post(
   }
 );
 
+//Route 3: Get loggedin user details: POST "/api/auth/getuser".Login required.....
+router.post(
+  "/getuser",
+  async (req, res) => {
+ try {
+  userId="todo";
+  const user=await User.findById(userId).select(-password);
+ } catch (error) {
+  console.error(error.message);
+  res.status(500).send("Internal Server Error");
+ }
+})
 module.exports = router;
