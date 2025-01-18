@@ -2,9 +2,9 @@ const connectToMongo=require("./db");// We have imported the function connectToM
 connectToMongo();
 
 
-const express = require('express')
-const app = express()
-const port = 5000
+const express = require('express');
+const app = express();
+const port = 5000;
 
 app.use(express.json());//This is the middleware which is used to print the req.body
 
